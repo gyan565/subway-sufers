@@ -8,7 +8,22 @@ export default function SubwayGame() {
     const canvas = canvasRef.current;
     const ctx = canvas.getContext("2d");
 
-    let player = { x: 140, y: 300, w: 30, h: 30 };
+    name: CI
+
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Run a script
+        run: echo "Hello World"
     let obstacles = [];
     let speed = 4;
     let running = true;
