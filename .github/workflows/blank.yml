@@ -1,0 +1,74 @@
+import { useEffect, useRef, useState } from "react";
+
+export default function SubwayGame() {
+  const canvasRef = useRef(null);
+  const [score, setScore] = useState(0);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    const ctx = canvas.getContext("2d");
+
+    let player = { x: 140, y: 300, w: 30, h: 30 };
+    let obstacles = [];
+    let speed = 4;
+    let running = true;
+
+    function spawnObstacle() {
+      obstacles.push({ x: Math.random() * 280, y: -30, w: 30, h: 30 });
+    }
+
+    function update() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      // Player
+      ctx.fillRect(player.x, player.y, player.w, player.h);
+
+      // Obstacles
+      obstacles.forEach((obs, i) => {
+        obs.y += speed;
+        ctx.fillRect(obs.x, obs.y, obs.w, obs.h);
+
+        // Collision
+        if (
+          player.x < obs.x + obs.w &&
+          player.x + player.w > obs.x &&
+          player.y < obs.y + obs.h &&
+          player.y + player.h > obs.y
+        ) {
+          running = false;
+          alert("Game Over! Score: " + score);
+          window.location.reload();
+        }
+
+        if (obs.y > canvas.height) {
+          obstacles.splice(i, 1);
+          setScore((s) => s + 1);
+        }
+      });
+
+      if (Math.random() < 0.02) spawnObstacle();
+
+      if (running) requestAnimationFrame(update);
+    }
+
+    update();
+
+    function move(e) {
+      if (e.key === "ArrowLeft" && player.x > 0) player.x -= 20;
+      if (e.key === "ArrowRight" && player.x < canvas.width - player.w)
+        player.x += 20;
+    }
+
+    window.addEventListener("keydown", move);
+    return () => window.removeEventListener("keydown", move);
+  }, []);
+
+  return (
+    <div className="flex flex-col items-center">
+      <h1 className="text-xl font-bold">Subway Style Game</h1>
+      <p>Score: {score}</p>
+      <canvas ref={canvasRef} width={300} height={400} className="border" />
+      <p>Use Left/Right Arrow Keys</p>
+    </div>
+  );
+}
